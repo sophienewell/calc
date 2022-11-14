@@ -7,21 +7,23 @@ function App() {
   const [calcVal, setCalcVal] = useState("");
   const [solution, setSolution] = useState("");
   const [pow, setPow] = useState(false);
+  const [err, setErr] = useState(false);
 
   const clear = () => {
     setEnteredVal("");
     setCalcVal("");
     setSolution("");
     setPow(false);
+    setErr(false);
   };
 
   const addVal = (e) => {
-    setEnteredVal(pow ? e.target.innerText : enteredVal + e.target.innerText);
+    setEnteredVal(enteredVal + e.target.innerText);
     setCalcVal(calcVal + e.target.innerText);
-    //setSelectedFunc("");
+    enteredVal.length > 11 ? setErr(true) : setErr(false);
   };
 
-  const plusMinus = (e) => {
+  const arith = (e) => {
     let symbol;
     if (pow && e.target.innerText !== "(" && selectedFunc !== "(") {
       setPow(false);
@@ -32,7 +34,9 @@ function App() {
 
     if (e.target.innerText === "x") {
       symbol = symbol + "*";
-    } else if (e.target.innerText === "(" && !selectedFunc && calcVal && !pow) {
+    }
+    //allows multiplication using brackets (no *)
+    else if (e.target.innerText === "(" && !selectedFunc && calcVal && !pow) {
       symbol = symbol + "*(";
     } else {
       symbol = symbol + e.target.innerText;
@@ -59,11 +63,9 @@ function App() {
     setPow(true);
     let lastValLength = enteredVal.length;
     setCalcVal(
-      calcVal.toString().slice(0, -lastValLength) +
-        "Math.pow(" +
-        enteredVal +
-        ", "
+      calcVal.toString().slice(0, -lastValLength) + `Math.pow(${enteredVal},`
     );
+    setTimeout(setEnteredVal(""), 100);
   };
 
   const equals = () => {
@@ -80,36 +82,64 @@ function App() {
     setSolution(newVal);
     setCalcVal(newVal);
     setEnteredVal(newVal);
+    newVal.toString().length > 11 ? setErr(true) : setErr(false);
   };
 
   return (
-    <>
+    <div className="outer-container">
       <div className="container">
-        <div className="display">{solution ? solution : enteredVal}</div>
+        <div className="display">
+          {solution
+            ? solution.toString().slice(0, 12)
+            : enteredVal.slice(0, 12)}
+        </div>
         <div className="buttons">
-          <button onClick={clear}>AC</button>
-          <button onClick={plusMinus}>(</button>
-          <button onClick={closeParenth}>)</button>
-          <button onClick={exponent}>xy</button>
+          <button className="function" onClick={clear}>
+            AC
+          </button>
+          <button className="function" onClick={arith}>
+            (
+          </button>
+          <button className="function" onClick={closeParenth}>
+            )
+          </button>
+          <button className="function" onClick={exponent}>
+            X<span className="textsmall">y</span>
+          </button>
           <button onClick={addVal}>7</button>
           <button onClick={addVal}>8</button>
           <button onClick={addVal}>9</button>
-          <button onClick={plusMinus}>/</button>
+          <button className="function" onClick={arith}>
+            /
+          </button>
           <button onClick={addVal}>4</button>
           <button onClick={addVal}>5</button>
           <button onClick={addVal}>6</button>
-          <button onClick={plusMinus}>x</button>
+          <button className="function" onClick={arith}>
+            x
+          </button>
           <button onClick={addVal}>1</button>
           <button onClick={addVal}>2</button>
           <button onClick={addVal}>3</button>
-          <button onClick={plusMinus}>-</button>
+          <button className="function" onClick={arith}>
+            -
+          </button>
           <button onClick={addVal}>0</button>
           <button onClick={addVal}>.</button>
-          <button onClick={plusMinus}>+</button>
-          <button onClick={equals}>=</button>
+          <button className="function" onClick={arith}>
+            +
+          </button>
+          <button className="function" onClick={equals}>
+            =
+          </button>
         </div>
       </div>
-    </>
+      {err && (
+        <div className="err">
+          <p>Display will show a maximum of 12 digits</p>
+        </div>
+      )}
+    </div>
   );
 }
 
