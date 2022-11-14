@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./App.css";
 
 function App() {
-  const [enteredVal, setEnteredVal] = useState("");
+  const [enteredVal, setEnteredVal] = useState(0);
   const [selectedFunc, setSelectedFunc] = useState(null);
   const [calcVal, setCalcVal] = useState("");
   const [solution, setSolution] = useState("");
@@ -10,7 +10,7 @@ function App() {
   const [err, setErr] = useState(false);
 
   const clear = () => {
-    setEnteredVal("");
+    setEnteredVal(0);
     setCalcVal("");
     setSolution("");
     setPow(false);
@@ -18,7 +18,12 @@ function App() {
   };
 
   const addVal = (e) => {
-    setEnteredVal(enteredVal + e.target.innerText);
+    setEnteredVal(
+      //0 will not be shown at the beginning of any number
+      enteredVal === 0 && e.target.innerText !== "."
+        ? e.target.innerText
+        : enteredVal + e.target.innerText
+    );
     setCalcVal(calcVal + e.target.innerText);
     enteredVal.length > 11 ? setErr(true) : setErr(false);
   };
@@ -91,7 +96,7 @@ function App() {
         <div className="display">
           {solution
             ? solution.toString().slice(0, 12)
-            : enteredVal.slice(0, 12)}
+            : enteredVal.toString().slice(0, 12)}
         </div>
         <div className="buttons">
           <button className="function" onClick={clear}>
